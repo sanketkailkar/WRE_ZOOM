@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import SessionsList from "@/components/SessionList";
-import "../styles/homePage.css";
+import "./../styles/homePage.css";
 
 export default function Home() {
   const [sessions, setSessions] = useState([]);
@@ -53,7 +53,7 @@ export default function Home() {
       });
       console.log("CREATE", response);
       setSessions(response.data.sessions || []);
-      setData(response);
+      setData(response.data);
       if (response.data) {
         fetchSessions();
       }

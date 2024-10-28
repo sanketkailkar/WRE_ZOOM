@@ -6,3 +6,9 @@
     height: auto;
     text-align: center;
 }
+
+.list {
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+}

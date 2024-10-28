@@ -14,8 +14,9 @@ export async function GET(req) {
     const toDate = "2024-10-28";
 
     try {
-        const response = await axios.get(`${ROUTES.GET_ALL_SESSIONS}?from=${fromDate}&to=${toDate}`, {
+        const response = await axios.get(`${ROUTES.GET_ALL_SESSIONS}?from=${fromDate}&to=${toDate}&type=past`, {
             headers: {
+                "Accept": "application/json",
                 "Authorization": `Bearer ${token}`,
             },
         });
