@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
-import { ROUTES } from "../../../../utils/helper";
 
 export async function POST(req) {
    
@@ -20,7 +19,7 @@ export async function POST(req) {
     }
 
     try {
-        const response = await axios.post(ROUTES.CREATE_API,
+        const response = await axios.post(process.env.NEXT_PUBLIC_ZOOM_BASE_URL,
             {
                 session_name: sessionName,
                 session_password: sessionPassword,

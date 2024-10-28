@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import cookie from "cookie";
 import { generateVideoSdkApiJwt } from "../../../../utils/sdkJWT";
 
 export async function POST() {

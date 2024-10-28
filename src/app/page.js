@@ -5,39 +5,58 @@ import SessionsList from "@/components/SessionList";
 import "./../styles/homePage.css";
 
 export default function Home() {
-  const [sessions, setSessions] = useState([]);
-  const [tokenSet, setTokenSet] = useState(false);
+  const [pastSessions, setPastSessions] = useState([]);
+  const [liveSessions, setLiveSessions] = useState([]);
   const [sessionName, setSessionName] = useState("");
   const [sessionPassword, setSessionPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingLive, setIsLoadingLive] = useState(false);
   const [isCreatingSession, setIsCreatingSession] = useState(false);
   const [data, setData] = useState();
 
-  const fetchSessions = async () => {
+  const fetchPastSessions = async () => {
+    if (isLoading) return;
     try {
       setIsLoading(true);
-      const response = await axios.get("/api/getSessions");
+      const response = await axios.get("/api/getPastSessions");
       console.log("GET", response);
-      setSessions(response.data.sessions || []);
+      setPastSessions(response.data.sessions || []);
     } catch (error) {
       console.error("Failed to fetch sessions:", error.message);
     } finally {
       setIsLoading(false);
     }
-  }
+  };
+
+  const fetchLiveSessions = async () => {
+    if (isLoadingLive) return;
+    try {
+      setIsLoadingLive(true);
+      const response = await axios.get("/api/getLiveSessions");
+      console.log("GET LIVE SESSIONS", response);
+      setLiveSessions(response.data.sessions || []);
+    } catch (error) {
+      console.error("Failed to fetch live sessions:", error.message);
+    } finally {
+      setIsLoadingLive(false);
+    }
+  };
 
   useEffect(() => {
-    const setTokenAndFetchSessions = async () => {
-      if (!tokenSet) {
+    const initializeTokenAndFetchSessions = async () => {
+      const tokenExists = localStorage.getItem("zoom-sdk-auth");
+
+      if (!tokenExists) {
         const jwt = await axios.post("/api/setToken");
-        localStorage.setItem('zoom-sdk-auth', JSON.stringify(jwt.data.token));
-        setTokenSet(true);
+        localStorage.setItem("zoom-sdk-auth", JSON.stringify(jwt.data.token));
       }
-      fetchSessions();
+
+      fetchPastSessions();
+      fetchLiveSessions();
     };
 
-    setTokenAndFetchSessions();
-  }, [tokenSet]);
+    initializeTokenAndFetchSessions();
+  }, []); // empty dependency array ensures this only runs on initial load
 
   const handleCreateSession = async () => {
     if (!sessionName || !sessionPassword) {
@@ -52,10 +71,10 @@ export default function Home() {
         sessionPassword,
       });
       console.log("CREATE", response);
-      setSessions(response.data.sessions || []);
+      setPastSessions(response.data.sessions || []);
       setData(response.data);
       if (response.data) {
-        fetchSessions();
+        fetchPastSessions();
       }
     } catch (error) {
       console.error("Failed to create session:", error.message);
@@ -94,11 +113,12 @@ export default function Home() {
         </div>
       </div>
       <p>{JSON.stringify(data)}</p>
-      {isLoading ? (
-        <p>Loading sessions...</p>
-      ) : (
-        <SessionsList sessions={sessions} />
-      )}
+
+      <h2>Past Sessions</h2>
+      <SessionsList sessions={pastSessions} loading={isLoading} />
+
+      <h2>Live Sessions</h2>
+      <SessionsList sessions={liveSessions} loading={isLoadingLive} />
     </main>
   );
 }
